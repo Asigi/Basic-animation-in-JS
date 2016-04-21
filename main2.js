@@ -20,12 +20,13 @@ function Animation(spriteSheet, frameStartY, frameWidth, frameHeight, sheetWidth
     this.loop = loop;
     this.scale = scale;
 }
+
 Animation.prototype.drawFrame = function (tick, ctx, x, y) {
     this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
     }
-	   var frame = this.currentFrame();
+	  var frame = this.currentFrame();
     var xindex = 0;
     var yindex = 0;
     xindex = frame % this.sheetWidth;
@@ -44,12 +45,14 @@ Animation.prototype.isDone = function () {
 };
 
 
-function Background(game) {
+
+
+
+function Background(game, backg) {
     this.game = game;
     this.ctx = game.ctx;
-    this.image = AM.getAsset("./img/bgd.jpg");
+    this.image = backg;
 }
-
 Background.prototype.draw = function (ctx) {
     ctx.drawImage(this.image, 0, 0);
 };
@@ -62,63 +65,68 @@ Background.prototype.update = function () {};
 
 
 function Alien(game, sprite, direction) {
-	this.walkLeftAnimation = new Animation(sprite, 0, 262, 262, 8, 0.10, 30, false, 1);
-  this.walkRightAnimation = new Animation(sprite, 0, 262, 262, 8, 0.10, 30, false, 1);
+	this.leftward = new Animation(sprite, 0, 262, 262, 8, 0.10, 30, false, 1);
+  this.rightward = new Animation(sprite, 0, 262, 262, 8, 0.10, 30, false, 1);
   this.game = game;
 	this.direction = direction;
   this.ctx = game.ctx;
 
-  if (direction == 2) { //left
+  if (direction == "left") {
       this.x = 900;
-      this.speed = 100;
+      this.speed = 300;
       this.y  = 200;
-  } 
+  } else if (direction == "right") {
+      this.x = 100;
+      this.speed = 100;
+      this.y = 350;
+  }
 }
 
 Alien.prototype.update = function() {
-	if(this.direction == 1) {
+
+	if(this.direction == "right") {
 		this.x += this.game.clockTick * this.speed;
-	} else if(this.direction == 2) {
+	} else { //left
 		this.x -= this.game.clockTick * this.speed;
-	} else if(this.direction == 3) {
-		this.y += this.game.clockTick * this.speed;
-	} else {
-		this.y -= this.game.clockTick * this.speed;
 	}
-	if(this.x > 1800 || this.x < 0) {
-		this.x = 900;
+
+
+	if(this.x > 1100 || this.x < -100) {
+    if (this.direction == "left") {
+        this.x = 1000;
+    } else{
+        this.x = -100;
+    }
 	}
-	if(this.y > 600 || this.y < 0) {
-		this.y = 250;
-	}
+
 };
 
 Alien.prototype.draw = function (ctx) {
-	if(this.direction == 2) {
-		this.walkLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	}
+	if(this.direction == "left") {
+		this.leftward.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else {
+    this.rightward.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  }
 };
 
 
 
 
-// the "main" code starts here...
 
 var AM = new AssetManager();
-
 AM.queueDownload("./img/alienSprite.png");
 AM.queueDownload("./img/bgd.jpg");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
 
-	  //2d context
     var ctx = canvas.getContext("2d");
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.start();
 
-    gameEngine.addEntity(new Background(gameEngine));
-    gameEngine.addEntity(new Alien(gameEngine, AM.getAsset("./img/alienSprite.png"), 2));
+    gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/bgd.jpg")));
+    gameEngine.addEntity(new Alien(gameEngine, AM.getAsset("./img/alienSprite.png"), "left"));
+    gameEngine.addEntity(new Alien(gameEngine, AM.getAsset("./img/alienSprite.png"), "right"));
 
 });

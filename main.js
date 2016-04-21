@@ -69,11 +69,11 @@ function Alien(game, spritesheet, direction) {
   	this.direction = direction;
     this.ctx = game.ctx;
 
-    if (direction = "left") {
+    if (direction == "left") {
         this.x = 900;
   	    this.speed = 100;
   	    this.y  = 200;
-    } else //must be right {
+    } else  { //must be right
         this.x = 100;
         this.speed = 100;
         this.y  = 400;
@@ -108,7 +108,7 @@ Alien.prototype.update = function() {
       if (this.direction = "left") {
           this.y = 200;
       } else{
-          this.x = 400;
+          this.y = 400;
       }
 	}
 };
